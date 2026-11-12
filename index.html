@@ -339,7 +339,7 @@ input,select{min-height:44px}
     <div class="cd"><small>Clave dinámica</small><b id="code">--- ---</b><div class='bar'><i id='cbar' style='width:100%;transition:none'></i></div><small class='syn' id='syn'>Solo en este dispositivo</small></div>
     <div class='mini' id='mini'></div>
     <div class="btns">
-      <button class='btn ic' id='sb' onclick='toggleSnd()' title='Sonidos'>♪</button><button class='btn ic' id='gb' onclick='gameModal()' title='Piedra, papel o tijera'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M6 8h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.2 2L15 15H9l-1.8 2A3 3 0 0 1 2 15v-3a4 4 0 0 1 4-4z'/><path d='M7 11v3M5.5 12.5h3'/><circle cx='16' cy='11.5' r='.6'/><circle cx='18' cy='13.5' r='.6'/></svg></button><button class='btn' onclick='backupForm()'>Respaldo</button><button class='btn' id='lk' onclick='lock()'>Salir</button><button class='btn ic' onclick='theme()' title='Cambiar tema'>◐</button>
+      <button class='btn ic' id='sb' onclick='toggleSnd()' title='Sonidos'>♪</button><button class='btn ic' id='gb' onclick='gameModal()' title='Piedra, papel o tijera'><svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M6 8h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.2 2L15 15H9l-1.8 2A3 3 0 0 1 2 15v-3a4 4 0 0 1 4-4z'/><path d='M7 11v3M5.5 12.5h3'/><circle cx='16' cy='11.5' r='.6'/><circle cx='18' cy='13.5' r='.6'/></svg></button><button class='btn' onclick='bioModal()'>Huella</button><button class='btn' onclick='backupForm()'>Respaldo</button><button class='btn' id='lk' onclick='lock()'>Salir</button><button class='btn ic' onclick='theme()' title='Cambiar tema'>◐</button>
       <button class="btn" onclick="resetAll()">Restablecer</button>
       <button class="btn pri" onclick="goalForm()">+ Nueva meta</button>
     </div>
@@ -382,13 +382,13 @@ input,select{min-height:44px}
 /* ============ CONFIGURACION DE FIREBASE (gratis) ============
    Pega aqui los datos de tu proyecto (Configuracion del proyecto > Tus apps > Web).
    Mientras diga "PEGA_AQUI", la pagina funciona solo en el dispositivo (sin compartir). */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyB57NMy0JL2JqTSVzn7R3RqyzDBsoFRySo",
-  authDomain: "metas-ea7c1.firebaseapp.com",
-  projectId: "metas-ea7c1",
-  storageBucket: "metas-ea7c1.firebasestorage.app",
-  messagingSenderId: "356718275550",
-  appId: "1:356718275550:web:bd923aa9b2e6f25a120b4f"
+const FIREBASE_CONFIG={
+ apiKey:"AIzaSyB57NMy0JL2JqTSVzn7R3RqyzDBsoFRySo",
+ authDomain:"metas-ea7c1.firebaseapp.com",
+ projectId:"metas-ea7c1",
+ storageBucket:"metas-ea7c1.firebasestorage.app",
+ messagingSenderId:"356718275550",
+ appId:"1:356718275550:web:bd923aa9b2e6f25a120b4f"
 };
 /* Puente: expone la misma interfaz claude.use('db') que usa la app, pero sobre Firestore. */
 (function(){
@@ -744,11 +744,11 @@ function authDraw(){
  const tt={enter:'Ingresa tu PIN',create:'Crea tu PIN de 5 dígitos',confirm:'Confirma tu PIN',partner:'PIN de '+other(w)+' para restablecer el tuyo'}[AU.mode];
  a.innerHTML=`<div class='au st'><div class='au-av'>${w[0]}</div><div class='au-h2'>Hola, ${w}</div><div class='au-s'>${tt}</div><div class='dots' id='dots'>${[0,1,2,3,4].map(i=>`<i class='${i<AU.buf.length?'on':''}'></i>`).join('')}</div><div class='au-m' id='aum'></div>
  <div class='pad'>${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick='padK(${n})'>${n}</button>`).join('')}<button class='gh' onclick='authBack()' title='Cambiar de persona'>←</button><button onclick='padK(0)'>0</button><button class='gh' onclick='padDel()'>⌫</button></div>
- <div class='au-l'>${AU.mode==='enter'?`<a onclick='authForgot()'>Olvidé mi PIN</a> · `:''}<a onclick='authBack()'>Cambiar de persona</a></div></div>`;
+ <div class='au-l'>${AU.mode==='enter'&&bioGet(w)?`<a onclick='bioLogin()'>Usar huella / Face ID</a> · `:''}${AU.mode==='enter'?`<a onclick='authForgot()'>Olvidé mi PIN</a> · `:''}<a onclick='authBack()'>Cambiar de persona</a></div></div>`;
  if(lockLeft(w)>0)lockTick()}
 function authPick(i){
  AU.w=WHO[i];AU.buf='';AU.first='';const k=AU.w.toLowerCase();
- const go=()=>{AU.mode=pinRec(k)?'enter':'create';authDraw()};
+ const go=()=>{AU.mode=pinRec(k)?'enter':'create';authDraw();if(AU.mode==='enter'&&bioGet(AU.w))bioLogin(true)};
  if(HASDB&&PINS[k]===undefined){$('auth').innerHTML=`<div class='au st'><div class='au-s'>Verificando…</div></div>`;let n=0;const t=setInterval(()=>{if(PINS[k]!==undefined||++n>14){clearInterval(t);go()}},250)}else go()}
 function authBack(){AU={w:null,mode:'enter',buf:'',first:'',busy:false,rc:''};authDraw()}
 function authMsg(t){const m=$('aum');if(m)m.textContent=t}
@@ -782,7 +782,7 @@ async function ensureRC(){
  const k=USER.toLowerCase(),r=pinRec(k);if(!r||r.rs)return;
  const c=rcGen(),rs=rnd(),nr={...r,rs,rh:await hpin(rcNorm(c),rs)};pinSaveLocal(k,nr);PINS[k]=nr;if(DBP)DBP.doc('meta/pin_'+k).set(nr).catch(()=>{});
  window.RCNOW=c;openM(`<h3 class='script'>Código de recuperación</h3><div class='row' style='margin:0'>Guárdalo en un lugar seguro. Es la única forma de recuperar tu PIN si lo olvidas, y no se mostrará de nuevo.</div><div class='rcb' style='text-align:center'>${c}</div><div class='end'><button class='btn' onclick='rcCopy()'>Copiar</button><button class='btn pri' onclick='closeM()'>Ya lo guardé</button></div>`)}
-function authOk(){USER=AU.w;FAIL[USER.toLowerCase()]=0;$('auth').style.display='none';$('app').style.display='block';$('lk').textContent='Salir · '+USER;startIdle();render();drawPet();snd('ok');toast((USER==='Juliana'?'Bienvenida, ':'Bienvenido, ')+USER);ensureRC();gameBadge();gameWatch()}
+function authOk(){USER=AU.w;FAIL[USER.toLowerCase()]=0;$('auth').style.display='none';$('app').style.display='block';$('lk').textContent='Salir · '+USER;startIdle();render();drawPet();snd('ok');toast((USER==='Juliana'?'Bienvenida, ':'Bienvenido, ')+USER);ensureRC();gameBadge();gameWatch();setTimeout(bioOffer,3000)}
 function lock(){USER=null;clearTimeout(IDLE);closeM();gmClose();const l=$('lvl');if(l)l.remove();$('app').style.display='none';showAuth()}
 function bump(){clearTimeout(IDLE);if(USER)IDLE=setTimeout(()=>{if(USER){lock();toast('Sesión bloqueada por inactividad')}},300000)}
 function startIdle(){if(!IDLEON){IDLEON=true;['mousemove','keydown','touchstart','click'].forEach(e=>document.addEventListener(e,bump,{passive:true}))}bump()}
@@ -912,9 +912,26 @@ function sync(){if(!DBR)return;const cur={};
  }catch(e){PINS.emanuel=PINS.juliana=null}
 })();
 
+/* ---- Biometria (WebAuthn: huella / Face ID) ---- */
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b))),ub64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+const bioOK=()=>!!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);
+const bioGet=w=>{try{return w?JSON.parse(localStorage.getItem(KEY+'_bio_'+w.toLowerCase())):null}catch(e){return null}};
+const bioWdOn=w=>{try{return localStorage.getItem(KEY+'_biow_'+w.toLowerCase())!=='0'}catch(e){return true}};
+async function bioReg(w){const c=await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'Metas E&J'},user:{id:new TextEncoder().encode(w.toLowerCase()),name:w,displayName:w},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000}});localStorage.setItem(KEY+'_bio_'+w.toLowerCase(),JSON.stringify({id:b64(c.rawId)}))}
+async function bioAsk(w){const r=bioGet(w);if(!r||!bioOK())return false;try{const a=await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:ub64(r.id),transports:['internal']}],userVerification:'required',timeout:60000}});return !!a}catch(e){return false}}
+async function bioLogin(auto){const w=AU.w;if(!w||AU.busy||lockLeft(w)>0||!bioGet(w))return;AU.busy=true;let ok=false;try{ok=await bioAsk(w)}finally{AU.busy=false}if(ok&&AU.w===w)authOk();else if(!auto)authMsg('No se pudo verificar. Usa tu PIN.')}
+function bioModal(){const w=USER,r=bioGet(w),ok=bioOK();
+ openM(`<h3 class='script'>Huella / Face ID</h3><div class='row' style='margin:0'>${!ok?'Este navegador no permite biometría (necesita HTTPS y un sensor).':r?'Activada en este dispositivo para '+esc(w)+'.':'Entra más rápido y protege los retiros. Se registra solo en este dispositivo.'}</div>${ok?(r?`<div class='row' style='margin-top:16px'><span>Pedir antes de retirar</span><b>${bioWdOn(w)?'Sí':'No'}</b></div><div class='end' style='justify-content:flex-start;flex-wrap:wrap'><button class='btn' onclick='bioTogW()'>${bioWdOn(w)?'Desactivar al retirar':'Activar al retirar'}</button><button class='btn' onclick='bioOff()'>Quitar huella</button></div>`:`<div class='end' style='justify-content:flex-start'><button class='btn pri' onclick='bioOn()'>Activar ahora</button></div>`):''}<div class='end'><button class='btn' onclick='closeM()'>Cerrar</button></div>`)}
+async function bioOn(){try{await bioReg(USER);toast('Huella activada');snd('ok')}catch(e){toast('No se pudo activar la huella')}bioModal()}
+async function bioOff(){if(!await bioAsk(USER)){toast('Verificación fallida');return}try{localStorage.removeItem(KEY+'_bio_'+USER.toLowerCase())}catch(e){}toast('Huella quitada');bioModal()}
+async function bioTogW(){const on=bioWdOn(USER);if(on&&!await bioAsk(USER)){toast('Verificación fallida');return}try{localStorage.setItem(KEY+'_biow_'+USER.toLowerCase(),on?'0':'1')}catch(e){}bioModal()}
+function bioOffer(){const w=USER;if(!w||LOCK||!bioOK()||bioGet(w)||$('ov').classList.contains('on'))return;const k=KEY+'_biod_'+w.toLowerCase();try{if(localStorage.getItem(k))return;localStorage.setItem(k,'1')}catch(e){}
+ openM(`<h3 class='script'>¿Usar huella o Face ID?</h3><div class='row'>Entra sin teclear el PIN y confirma los retiros con tu huella. El PIN sigue funcionando como respaldo.</div><div class='end'><button class='btn' onclick='closeM()'>Ahora no</button><button class='btn pri' onclick='bioOn()'>Activar</button></div>`)}
+
 /* ---- Retiro: preguntas una por una ---- */
 const WZ=['¿Para qué necesitas exactamente este dinero? Detalla en qué se va cada peso.','¿Cuántas veces has retirado de esta meta antes, y por qué esta vez sería diferente?','¿Qué parte de este gasto es una necesidad real y qué parte es un deseo?','¿Qué otras fuentes de dinero intentaste usar antes de tocar este ahorro?','¿Qué emoción sientes ahora mismo y qué la provocó?','¿Qué estás sacrificando de tu sueño con este retiro? ¿Cuánto lo atrasa?','¿Cómo te sentirías si tu pareja viera este gasto mañana mismo?','¿Tu pareja sabe de este retiro y está de acuerdo? ¿Qué te dijo?','¿En qué fecha exacta y con qué dinero vas a reponer lo que sacas?','Con tus propias palabras: ¿por qué mereces romper tu compromiso hoy? (escribe además la clave dinámica)'];
-function wdStart(id){
+async function wdStart(id){
+ if(bioGet(USER)&&bioWdOn(USER)){toast('Verifica tu huella para retirar');if(!await bioAsk(USER)){toast('Verificación fallida: no se puede retirar');return}}
  const g=S.goals.find(x=>x.id===id);
  if(g.saved<=0){toast('Esta meta no tiene fondos para retirar');return}
  openM(`<div class="st"><h3 class="script">Retirar</h3><div class="row" style="margin:0">${esc(g.title)} · ${fmt(g.saved)}</div><div class="row" style="margin-top:14px">Protocolo anti-impulso: deberán responder ${WZ.length} preguntas, una tras otra. No se puede retirar hasta responderlas todas.</div>
@@ -933,12 +950,13 @@ function wdQ(){
  ${last?'<label>Clave dinámica vigente (la de arriba, cambia cada 30 s)</label><input id="w_c" inputmode="numeric" maxlength="7" required placeholder="000 000" autocomplete="off">':''}
  <div class="end"><button type="button" class="btn" onclick="closeM()">Cancelar y conservar la meta</button><button class="btn pri">${last?'Confirmar retiro':'Responder'}</button></div></form></div>`;
  setTimeout(()=>{const t=$('w_t');if(t)t.focus()},60)}
-function wdNext(e){e.preventDefault();
+async function wdNext(e){e.preventDefault();
  const t=$('w_t').value.trim(),last=W.i===WZ.length-1;
  if(t.length<12){toast('Responde con más detalle (mínimo 12 caracteres)');return}
  if(last&&!validCode($('w_c').value.replace(/\D/g,''))){toast('Clave incorrecta o vencida');return}
  W.ans[W.i]=t;
  if(!last){W.i++;snd('tick');wdQ();return}
+ if(bioGet(USER)&&bioWdOn(USER)){toast('Confirma con tu huella');const ok=await bioAsk(USER);if(!W)return;if(!ok){toast('Verificación fallida: retiro cancelado');return}}
  const g=S.goals.find(x=>x.id===W.id),a=W.a;
  g.saved-=a;g.hist.push({t:'w',a,ts:Date.now(),who:W.who,note:'Retiro: '+W.ans[0],qa:W.ans});
  const add=Math.max(7,Math.ceil(a/g.target*180)),b=new Date(Math.max(new Date(g.date+'T00:00'),new Date()));b.setDate(b.getDate()+add);g.date=iso(b);
